@@ -802,6 +802,13 @@ with col1 :
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')    
+        
+        rank_list1 = [new_med_time_rank,
+                      prop_reduced_rank,
+                      prop_under_nat_median_rank,
+                      time_reduction_rank,
+                      dist_reduction_rank,
+                      max_time_rank]
     
     elif len(sites) == 0 :
         pass
@@ -988,6 +995,13 @@ with col2 :
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')    
+        
+        rank_list2 = [new_med_time_rank,
+                      prop_reduced_rank,
+                      prop_under_nat_median_rank,
+                      time_reduction_rank,
+                      dist_reduction_rank,
+                      max_time_rank]
     
     elif len(sites) == 0 :
         pass
@@ -1015,6 +1029,23 @@ elif len(selected_site_pair1) == 1 and len(selected_site_pair2) == 1 :
         st.markdown('### Comparing these 2 configurations we see the option of')
         st.markdown(f'## {selected_site_pair2[0]}')
         st.markdown(f'### is superior in {count_metric2} out of {len(rank_list2)} metrics.')
+
+elif len(selected_site_pair1) == 2 and len(selected_site_pair2) == 2 :
+    count_metric1 = sum([rank_list1[i]<rank_list2[i] for i in range(len(rank_list1))])
+    count_metric2 = sum([rank_list2[i]<rank_list1[i] for i in range(len(rank_list2))])
+    if count_metric1 > count_metric2 :
+        st.markdown(f'### Comparing these 2 configurations we see the option of')
+        st.markdown(f'## {selected_site_pair1[0]}')
+        st.markdown(f'## {selected_site_pair1[1]}')
+        st.markdown(f'### is superior in {count_metric1} out of {len(rank_list1)} metrics.')
+   
+    elif count_metric2 > count_metric1 :
+        st.markdown('### Comparing these 2 configurations we see the option of')
+        st.markdown(f'## {selected_site_pair2[0]}')
+        st.markdown(f'## {selected_site_pair2[1]}')
+        st.markdown(f'### is superior in {count_metric2} out of {len(rank_list2)} metrics.')
+
+
 else :
     pass
 
