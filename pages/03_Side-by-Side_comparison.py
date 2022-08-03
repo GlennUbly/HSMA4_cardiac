@@ -772,8 +772,8 @@ with col1 :
         max_time_rank = max_time_dict[site]
         
         st.markdown('#### Impact of additional sites on key travel time metrics:')
-        st.markdown(f'### {selected_site_pair1[0]}')
-        st.markdown(f'### {selected_site_pair1[1]}')
+        st.markdown(f'#### {selected_site_pair1[0]}')
+        st.markdown(f'#### {selected_site_pair1[1]}')
         
         st.markdown(f'* Median travel time for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
