@@ -6,6 +6,8 @@ import geopandas as gpd
 import numpy as np
 import seaborn as sbn
 
+st.title('Conclusions')
+
 'To add'
 st.write('Show optimal configurations for 1 or 2 sites')
 
