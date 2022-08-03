@@ -1,4 +1,3 @@
-# Page for comparing configurations side by side
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -593,6 +592,7 @@ site_dict2 = dict(zip(km_prov_gdf['Provider_Site_Code'], km_prov_gdf['Provider_S
 site_list = list(km_prov_gdf['Provider_Site_Name'])
 current_site_names = [site_dict2[site] for site in current_sites]
 site_list = list(set(site_list) - set(current_site_names))
+site_list.sort()
 df_results = get_summary_table(prov_gdf,
                                current_sites,
                                df_activity,
@@ -618,8 +618,14 @@ col1, col2 = st.columns(2)
 
 with st.sidebar :
     with st.form('select_sites_form') :
-        selected_site_pair1 = st.multiselect('First configuration for comparison:',site_list)
-        selected_site_pair2 = st.multiselect('Second configuration for comparison:',site_list)
+        selected_site_pair1 = st.multiselect('First configuration for comparison:',
+                                             site_list,
+                                             default=[site_list[0]]
+                                             )
+        selected_site_pair2 = st.multiselect('Second configuration for comparison:',
+                                             site_list,
+                                             default=[site_list[-1]]
+                                             )
         st.form_submit_button("Submit")
 
 with col1 :

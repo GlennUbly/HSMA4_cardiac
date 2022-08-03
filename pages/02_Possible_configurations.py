@@ -581,6 +581,7 @@ site_dict2 = dict(zip(km_prov_gdf['Provider_Site_Code'], km_prov_gdf['Provider_S
 site_list = list(km_prov_gdf['Provider_Site_Name'])
 current_site_names = [site_dict2[site] for site in current_sites]
 site_list = list(set(site_list) - set(current_site_names))
+site_list.sort()
 df_results = get_summary_table(prov_gdf,
                                current_sites,
                                df_activity,
@@ -638,6 +639,7 @@ with st.sidebar :
     with st.form('select_sites_form') :
         selected_site_pair = st.multiselect('Second configuration for comparison:',
                                             site_list,
+                                            default=[site_list[0]],
                                             key='select_sites')
         submit_button = st.form_submit_button(label="Submit")
 
