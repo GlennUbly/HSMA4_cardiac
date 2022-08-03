@@ -775,31 +775,31 @@ with col1 :
         st.markdown(f'### {selected_site_pair1[0]}')
         st.markdown(f'### {selected_site_pair1[1]}')
         
-        st.write(f'Median travel time for Kent and Medway patients reduced '+
+        st.markdown(f'* Median travel time for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write(f'Travel times would be reduced for {100*proportion_reduced:.0f}% '+
+        st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write('Travel times would be reduced to less than the national median '+
+        st.markdown(f'* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write(f'Mean travel time reduction would be {mean_time_reduction:.0f} '+
+        st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
         
-        st.write(f'Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
+        st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
         
-        st.write(f'The new maximum travel time would be {new_max_time:.0f} minutes. '+
+        st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')    
     
@@ -961,31 +961,31 @@ with col2 :
         st.markdown(f'#### {selected_site_pair2[0]}')
         st.markdown(f'#### {selected_site_pair2[1]}')
         
-        st.write(f'Median travel for Kent and Medway patients reduced '+
+        st.markdown(f'* Median travel for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write(f'Travel times would be reduced for {100*proportion_reduced:.0f}% '+
+        st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write('Travel times would be reduced to less than the national median '+
+        st.markdown(f'* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
         
-        st.write(f'Mean travel time reduction would be {mean_time_reduction:.0f} '+
+        st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
         
-        st.write(f'Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
+        st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
         
-        st.write(f'The new maximum travel time would be {new_max_time:.0f} minutes. '+
+        st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')    
     
