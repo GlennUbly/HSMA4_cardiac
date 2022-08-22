@@ -1,0 +1,113 @@
+﻿Procedure type,OPCS_L4_Desc
+TAVI,Y494: Transapical approach to heart
+TAVI,Y531: Approach to organ under radiological control
+TAVI,Y532: Approach to organ under ultrasonic control
+TAVI,Y533: Approach to organ under computed tomography scan control
+TAVI,Y534: Approach to organ under fluoroscopic control
+TAVI,Y535: Approach to organ under image intensifier
+TAVI,Y536: Approach to organ under video control
+TAVI,Y537: Approach to organ under magnetic resonance imaging control
+TAVI,Y538: Other specified approach to organ under image control
+TAVI,Y539: Unspecified approach to organ under image control
+TAVI,Y791: Transluminal approach to organ through subclavian artery
+TAVI,Y792: Transluminal approach to organ through brachial artery
+TAVI,Y793: Transluminal approach to organ through femoral artery
+TAVI,Y794: Transluminal approach to organ through aortic artery
+TAVI,Y798: Other specified approach to organ through artery
+TAVI,Y799: Unspecified approach to organ through artery
+Other valve procedure,K251: Allograft replacement of mitral valve
+Other valve procedure,K252: Xenograft replacement of mitral valve
+Other valve procedure,K253: Prosthetic replacement of mitral valve
+Other valve procedure,K254: Replacement of mitral valve NEC
+Other valve procedure,K255: Mitral valve repair NEC
+Other valve procedure,K258: Other specified plastic repair of mitral valve
+Other valve procedure,K259: Unspecified plastic repair of mitral valve
+Aortic Valve Replacement,K261: Allograft replacement of aortic valve
+Aortic Valve Replacement,K262: Xenograft replacement of aortic valve
+Aortic Valve Replacement,K263: Prosthetic replacement of aortic valve
+Aortic Valve Replacement,K264: Replacement of aortic valve NEC
+Aortic Valve Replacement,K265: Aortic valve repair NEC
+Aortic Valve Replacement,K268: Other specified plastic repair of aortic valve
+Aortic Valve Replacement,K269: Unspecified plastic repair of aortic valve
+Other valve procedure,K271: Allograft replacement of tricuspid valve
+Other valve procedure,K272: Xenograft replacement of tricuspid valve
+Other valve procedure,K273: Prosthetic replacement of tricuspid valve
+Other valve procedure,K274: Replacement of tricuspid valve NEC
+Other valve procedure,K275: Repositioning of tricuspid valve
+Other valve procedure,K276: Tricuspid valve repair NEC
+Other valve procedure,K278: Other specified plastic repair of tricuspid valve
+Other valve procedure,K279: Unspecified plastic repair of tricuspid valve
+Other valve procedure,K281: Allograft replacement of pulmonary valve
+Other valve procedure,K282: Xenograft replacement of pulmonary valve
+Other valve procedure,K283: Prosthetic replacement of pulmonary valve
+Other valve procedure,K284: Replacement of pulmonary valve NEC
+Other valve procedure,K285: Pulmonary valve repair NEC
+Other valve procedure,K288: Other specified plastic repair of pulmonary valve
+Other valve procedure,K289: Unspecified plastic repair of pulmonary valve
+Other valve procedure,K291: Allograft replacement of valve of heart NEC
+Other valve procedure,K292: Xenograft replacement of valve of heart NEC
+Other valve procedure,K293: Prosthetic replacement of valve of heart NEC
+Other valve procedure,K294: Replacement of valve of heart NEC
+Other valve procedure,K295: Repair of valve of heart NEC
+Other valve procedure,K296: Truncal valve repair
+Other valve procedure,K297: Replacement of truncal valve
+Other valve procedure,K298: Other specified plastic repair of unspecified valve of heart
+Other valve procedure,K299: Unspecified plastic repair of unspecified valve of heart
+Other valve procedure,K301: Revision of plastic repair of mitral valve
+Aortic Valve Replacement,K302: Revision of plastic repair of aortic valve
+Other valve procedure,K303: Revision of plastic repair of tricuspid valve
+Other valve procedure,K304: Revision of plastic repair of pulmonary valve
+Other valve procedure,K305: Revision of plastic repair of truncal valve
+Other valve procedure,K308: Other specified revision of plastic repair of valve of heart
+Other valve procedure,K309: Unspecified revision of plastic repair of valve of heart
+Other valve procedure,K311: Open mitral valvotomy
+Aortic Valve Replacement,K312: Open aortic valvotomy
+Other valve procedure,K313: Open tricuspid valvotomy
+Other valve procedure,K314: Open pulmonary valvotomy
+Other valve procedure,K315: Open truncal valvotomy
+Other valve procedure,K318: Other specified open incision of valve of heart
+Other valve procedure,K319: Unspecified open incision of valve of heart
+Other valve procedure,K321: Closed mitral valvotomy
+Aortic Valve Replacement,K322: Closed aortic valvotomy
+Other valve procedure,K323: Closed tricuspid valvotomy
+Other valve procedure,K324: Closed pulmonary valvotomy
+Other valve procedure,K328: Other specified closed incision of valve of heart
+Other valve procedure,K329: Unspecified closed incision of valve of heart
+Other valve procedure,K331: Aortic root replacement using pulmonary valve autograft with right ventricle to pulmonary artery valved conduit
+Other valve procedure,K332: Aortic root replacement using pulmonary valve autograft with right ventricle to pulmonary artery valved conduit and aortoventriculoplasty
+Other valve procedure,K333: Aortic root replacement using homograft
+Other valve procedure,K334: Aortic root replacement using mechanical prosthesis
+Other valve procedure,K335: Aortic root replacement NEC
+Other valve procedure,K336: Aortoventriculoplasty with pulmonary valve autograft
+Other valve procedure,K338: Other specified operations on aortic root
+Other valve procedure,K339: Unspecified operations on aortic root
+Other valve procedure,K341: Annuloplasty of mitral valve
+Other valve procedure,K342: Annuloplasty of tricuspid valve
+Other valve procedure,K343: Annuloplasty of valve of heart NEC
+Other valve procedure,K344: Excision of vegetations of valve of heart
+Other valve procedure,K345: Closure of tricuspid valve
+Other valve procedure,K346: Closure of pulmonary valve
+Other valve procedure,K348: Other specified other open operations on valve of heart
+Other valve procedure,K349: Unspecified other open operations on valve of heart
+Other valve procedure,K358: Other specified therapeutic transluminal operations on valve of heart
+Other valve procedure,K359: Unspecified therapeutic transluminal operations on valve of heart
+Other valve procedure,K361: Tricuspid valvectomy
+Other valve procedure,K362: Pulmonary valvectomy
+Other valve procedure,K368: Other specified excision of valve of heart
+Other valve procedure,K369: Unspecified excision of valve of heart
+Other valve procedure,K371: Infundibulectomy of heart using patch
+Other valve procedure,K372: Infundibulectomy of heart NEC
+Other valve procedure,K373: Repair of subaortic stenosis
+Other valve procedure,K374: Repair of supra-aortic stenosis
+Other valve procedure,K375: Excision of supramitral ring
+Other valve procedure,K376: Aortoventriculoplasty
+Other valve procedure,K378: Other specified removal of obstruction from structure adjacent to valve of heart
+Other valve procedure,K379: Unspecified removal of obstruction from structure adjacent to valve of heart
+Other valve procedure,K381: Operations on papillary muscle
+Other valve procedure,K382: Operations on chordae tendineae
+Other valve procedure,K383: Operations on mitral subvalvar apparatus
+Other valve procedure,K384: Closure of aorto-left ventricular tunnel
+Other valve procedure,K385: Closure of aortic sinus of Valsalva fistula
+Other valve procedure,K386: Repair of aortic sinus of Valsalva aneurysm
+Other valve procedure,K388: Other specified other operations on structure adjacent to valve of heart
+Other valve procedure,K389: Unspecified other operations on structure adjacent to valve of heart
