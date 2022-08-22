@@ -10,7 +10,7 @@ st.title('Conclusions')
 
 'To add'
 st.write('Show optimal configurations for 1 or 2 sites '+
-         'Maidstone for 1 site, or Maidstone plus xx for 2 sites.')
+         'Maidstone for 1 site, or Maidstone plus Canterbury for 2 sites.')
 
 st.write('Maybe radio buttons to flip between 1 and 2')
 
