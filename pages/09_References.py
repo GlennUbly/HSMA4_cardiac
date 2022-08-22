@@ -8,10 +8,11 @@ st.write('Include lists of procedure codes, providers as expandable lists')
 st.write('Data sources, SQL, software used, relevant NHS policies on this '+
          'service and reducing travel times justification')
 
-st.markdown('#### Sites with > 10 procedures nationally:')
+#st.markdown('#### Sites with > 10 procedures nationally:')
 national_provider_filename = 'valve_providers.csv'
 #activity_data_filename = "Cardiac valves_national v0.2.csv"
 activity_data_minimal_filename = "activity_data_minimal.csv"
+procedure_ref = "opcs_table.csv"
 
 
 def get_national_providers_list(national_provider_filename, activity_data_minimal_filename) :
@@ -22,7 +23,13 @@ def get_national_providers_list(national_provider_filename, activity_data_minima
     nat_prov10 = df_prov[df_prov['Provider_Site_Code'].isin(list(prov_code_list.index))]
     return nat_prov10
 
-st.write(get_national_providers_list(national_provider_filename, 
+
+df_opcs = pd.read_csv(procedure_ref)
+with st.expander("Cardiac valve procedures list", 
+                 expanded=False) :
+    st.write(df_opcs)
+
+with st.expander("Sites with > 10 procedures nationally", 
+                 expanded=False) :
+    st.write(get_national_providers_list(national_provider_filename, 
                                      activity_data_minimal_filename))
-
-
