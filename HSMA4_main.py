@@ -14,9 +14,12 @@ import numpy as np
 import seaborn as sbn
 import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy import stats
 import itertools
 import time
 from PIL import Image
+from bokeh.plotting import ColumnDataSource, figure, output_file, show, output_notebook
+from bokeh.models import LinearInterpolator
 
 # for time test
 start_full = time.time()
@@ -78,7 +81,7 @@ def filter_lsoa_to_ics(shape_filename,ics_lsoa_filename,left_on,right_on):
 # causes problems if cached, OK if not
 def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #st.write("Cache miss: plot_proposed_sites1 ran")
-    fig, ax = plt.subplots(figsize=(10, 10)) # Make max dimensions 10x10 inch
+    fig, ax = plt.subplots(figsize=(10, 8)) # Make max dimensions 10x10 inch
     # Plot travel times for each LSOA
     ics_gdf.plot(ax=ax, # Set which axes to use for plot (only one here)
             #column='Travel_time', # Column to apply colour
@@ -108,7 +111,7 @@ def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     # ctx.add_basemap(ax,source=ctx.providers.OpenStreetMap.Mapnik,zoom=10, crs='epsg:27700')
 
     ax.set_axis_off() # Turn on/off axis line numbers
-    ax.set_title(axis_title, fontsize=20)
+    ax.set_title(axis_title, fontsize=12)
     # Adjust for printing
     ax.margins(0.05)
     #ax.apply_aspect()
@@ -552,7 +555,7 @@ def plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_l
 #
 #############################################################################
 
-@st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True, allow_output_mutation=True)
 def get_national_time_map(ccg_mapping_filename, activity_data_minimal_filename) :
     #st.write("Cache miss: get_national_time_map ran")
     df_ccg = pd.read_csv(ccg_mapping_filename, encoding = 'unicode_escape')
@@ -675,6 +678,10 @@ df_results = get_summary_table(prov_gdf,
                                site_pairs,
                                save_output)
 
+nat_act_gdf['Travel_time_rank_asc'] = nat_act_gdf['Travel_time'].rank(ascending=True)
+nat_act_gdf['Pop_density_rank'] = nat_act_gdf['Population_density'].rank(ascending=False)
+
+
 #############################################################################
 #############################################################################
 ###
@@ -700,11 +707,18 @@ st.markdown("#### A comparison of possible configurations of sites offering "+
 st.markdown("We first look at a sample of our data - all elective cardiac "+
             "valve surgery for patients throughout England between 2016/17 "+
             "and 2021/22. Based on an OPCS procedure code list (see ref), we "+
-            "identify 71,077 spells. This a small sample:")
-st.write(df_activity.head())
+            "identify 71,073 spells. ")
+#st.write(df_activity.head())
 
-st.write("Add in detail about the range and distribution of travel times, "+
-         "activity levels, providers to include...")
+#st.dataframe(nat_act_gdf)
+st.write("Nationally, based on Routino data, we see a mean travel time of "+
+         f"{df_activity['Travel_time'].mean():.0f} minutes "+
+         f"and a median of {df_activity['Travel_time'].median():.0f} minutes.")
+st.dataframe(df_activity.describe([0, 0.25, 0.5, 0.75, 0.95]))
+
+
+#st.write("Add in detail about the range and distribution of travel times, "+
+#         "activity levels, providers to include...")
 
 st.markdown("We map the travel times based on Routino data for the patient "+
             "home LSOA and the provider site postcode, showing the mean "+
@@ -742,17 +756,85 @@ if not os.path.exists(os.getcwd()+'/output/nat_map_ccg.png') :
 else :
     nat_map_ccg = Image.open(os.getcwd()+'/output/nat_map_ccg.png')
     st.image(nat_map_ccg)
-    
-st.markdown("#### We observe that Kent and Medway CCG sees travel times "+
-            "longer then all but 5 CCGs nationally, and these 5 all have "+
-            "significantly lower population density. Thus there is a case "+
-            "for considering a possible site or sites for new cardiac "+
-            "valve surgery centre(s) in this area.")
 
-st.markdown("#### We assess the likely impact of new site(s) on travel "+
-            "times for Kent and Medway patients. The sites considered "+
-            "are the seven in the area with an existing adult critical "+
-            "care unit.")
+st.write("Looking at travel times by CCG, we note a negative "+
+         "correlation between population density and mean travel time. "+
+         "")
+
+with st.expander("Ranked travel time and population density by CCG", 
+                 expanded=False) :
+    st.dataframe(nat_act_gdf[['CCG_2122',
+                              'Travel_time',
+                              'Travel_time_rank_asc',
+                              'Pop_density_rank',
+                              'Population_density',
+                              'Population'
+                              ]])
+
+# chart to show correlations
+df = nat_act_gdf[['CCG_2122',
+                  'Travel_time',
+                  'Travel_time_rank_asc',
+                  'Pop_density_rank',
+                  'Population_density',
+                  'Population'
+                  ]]
+
+size_mapper=LinearInterpolator(
+    x=[df.Population.min(),df.Population.max()],
+    y=[5,20]
+    )
+
+source = ColumnDataSource(data=dict(
+    x=df['Population_density'],
+    y=df['Travel_time'],
+    desc1=df['CCG_2122'],
+    desc2=df['Population'],
+    ))
+
+TOOLTIPS = [
+    ("CCG", "@desc1"),
+    ("Population density", "@x{0}"),
+    ("Mean travel time", "@y{0}"),
+    ("Population", "@desc2")
+    ]
+
+fig = figure(width=600, 
+             height=600,
+             tooltips=TOOLTIPS,
+             title="Population density against travel time by CCG")
+
+fig.circle('x',
+           'y', 
+           size={'field':'desc2','transform': size_mapper}, 
+           source=source)
+fig.xaxis.axis_label = 'Population density (per sq km)'
+fig.yaxis.axis_label = 'Mean travel time (mins)'
+st.bokeh_chart(fig, use_container_width=True)
+
+
+a = stats.spearmanr(nat_act_gdf['Travel_time'],nat_act_gdf['Population_density'])
+
+st.write("We calculate Spearman's rank correlation coefficient to show "+
+         "the negative correaltion between CCG mean travel time and "+
+         "population density as:")
+st.latex(r'''
+         \rho = 
+         ''' +
+         rf''' {a[0]:.2f} '''
+         )
+st.latex(r'''
+         p = 
+         ''' +
+         rf''' {a[1]:.19f} '''
+         )
+
+st.write("We observe that Kent and Medway CCG sees travel times "+
+         "longer then all but 8 CCGs nationally, and these mostly have "+
+         "significantly lower population density. Thus there is a case "+
+         "for considering a possible site or sites for new cardiac "+
+         "valve surgery centre(s) in this area.")
+
 
 if not os.path.exists('output') :
     os.mkdir('output')
@@ -762,11 +844,13 @@ if not os.path.exists(os.getcwd()+'/output/kent_prov.png') :
                              'Proposed Sites in Kent and Medway')
     fig, ax = f
     plt.savefig(os.getcwd()+'/output/kent_prov.png')
-    st.pyplot(fig)
+    #st.pyplot(fig)
 else :
-    kent_prov = Image.open(os.getcwd()+'/output/kent_prov.png')
-    st.image(kent_prov)
+    #kent_prov = Image.open(os.getcwd()+'/output/kent_prov.png')
+    #st.image(kent_prov)
+    pass
 
 
 end_full = time.time()
 st.write('Total time to run '+str(end_full - start_full))
+
