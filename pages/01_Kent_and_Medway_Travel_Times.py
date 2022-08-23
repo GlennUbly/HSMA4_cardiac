@@ -71,17 +71,77 @@ def read_ccg_geo_pop_data(ccg_gdf_travel):
     gdf['Travel_time'] = gdf['Travel_time'].astype(float)
     return gdf
 
+#@st.cache(suppress_st_warning=True)
+# causes problems if cached, OK if not
+def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
+    #st.write("Cache miss: plot_proposed_sites1 ran")
+    fig, ax = plt.subplots(figsize=(5, 10)) # Make max dimensions 10x10 inch
+    # Plot travel times for each LSOA
+    ics_gdf.plot(ax=ax, # Set which axes to use for plot (only one here)
+            #column='Travel_time', # Column to apply colour
+            # antialiased=False, # Avoids artifact boundry lines
+            edgecolor='gray', # Make LSOA boundry same colour as area
+            linewidth=0.5,# Use linewidth=0 to hide boarder lines
+            vmin=-100, # Manual scale min (remove to make automatic)
+            vmax=200, # Manual scale max (remove to make automatic)
+            #cmap='inferno_r', # Coloour map to use
+            # Adjust size of colourmap key, and add label
+            #legend_kwds={'shrink':0.5, 'label':'Travel time (mins)'},
+            # Set to display legend
+            #legend=True,
+            # Set transparancy (to help reveal basemap)
+            alpha = 0.70)
+
+    # Plot location of hospitals
+    prov_gdf.plot(ax=ax, edgecolor='k', facecolor='gold', markersize=200,marker='*')
+    # Add labels
+    for x, y, label in zip(
+        prov_gdf.geometry.x, prov_gdf.geometry.y, prov_gdf.Provider_Site_Name):
+            ax.annotate(label, xy=(x, y), xytext=(8, 8), textcoords="offset points",
+                        backgroundcolor="y", fontsize=8)
+
+    # Add base map (note that we specifiy the same CRS as we are using)
+    # Use manual zoom to adjust level of detail of base map
+    # ctx.add_basemap(ax,source=ctx.providers.OpenStreetMap.Mapnik,zoom=10, crs='epsg:27700')
+
+    ax.set_axis_off() # Turn on/off axis line numbers
+    ax.set_title(axis_title, fontsize=20)
+    # Adjust for printing
+    ax.margins(0.05)
+    #ax.apply_aspect()
+    #plt.subplots_adjust(left=0.01, right=1.0, bottom=0.0, top=1.0)
+    # Save figure
+    #plt.savefig('map.jpg', dpi=300)
+    #return plt.show()
+    return fig, ax
+
 gdf = read_ccg_geo_pop_data(ccg_gdf_travel)
 
-# plot inetractive map of CCGs showing travel times and pop dens etc as tooltip
-
-
-
 st.title('Kent and Medway travel times')
-st.write('Add details of the exceptionality of this CCG in terms of '+
-         'long travel times for the geographic and demographic features. '+
-         'Use analysis in Travel_time_pop_density.ipynb to show K&M is an '+
-         'exception to the (negative) rank correlation of population density '+
-         'and median travel time.')
 
+st.write("We assess the likely impact of new site(s) on travel "+
+         "times for Kent and Medway patients. The sites considered "+
+         "are the seven in the area with an existing adult critical "+
+         "care unit.")
+
+
+kent_prov = Image.open(os.getcwd()+'/output/kent_prov.png')
+st.image(kent_prov)
+
+kent_kde = Image.open(os.getcwd()+'/output/km_current_kde.png')
+st.write('The current travel times for Kent and Medway patients are as '+
+         'follows, with 98.7% of patients with travel times greater than the '+
+         ' national median time of 27 minutes')
+st.image(kent_kde)
+
+kent_map = Image.open(os.getcwd()+'/output/km_current_map.png')
+st.write('The current travel times are distributed geographically as '+
+          'follows, with almost all patients travelling to the 2 London '+
+          'sites shown')
+st.image(kent_map)
+
+kent_threshold_map = Image.open(os.getcwd()+'/output/km_current_threshold_map.png')
+st.write('We see only small area close to London currently sees travel times '+
+         'less than the national median')
+st.image(kent_threshold_map)
 
