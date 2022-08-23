@@ -296,6 +296,7 @@ def plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_lis
     gdf.plot(ax=ax,
              column='Time_change',
              legend=True,
+             legend_kwds={'shrink':0.8, 'label':'Travel time change (mins)'},
              cax=cax
              )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
@@ -541,6 +542,7 @@ def plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_l
     gdf.plot(ax=ax,
              column='new_min_time',
              legend=True,
+             legend_kwds={'shrink':0.8, 'label':'Travel time (mins)'},
              cax=cax
             )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
