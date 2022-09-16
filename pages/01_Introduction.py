@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-st.title('Reducign Travel Times to Treatment for Cardiac Patients in South East England')
+st.title('Reducing Travel Times to Treatment for Cardiac Patients in South East England')
 
 st.markdown('_Glenn Ubly - NHS England and Improvement<br>Janine James - NHS England and Improvement<br>Antonia Drummond - NHS England and Improvement<br>Victor Yu - Hertfordshire County Council_', unsafe_allow_html=True)
 
@@ -10,4 +10,4 @@ st.markdown('"Moving care closer to home" has become a high-priority goal for ma
 
 st.markdown('Bringing care closer to home can reduce travel times for patients, with it being a critical factor in many aspects of healthcare delivery, patient satisfaction and health outcomes.')
 
-st.markdown('Initial scoping of our project focused on all cardiac activity, but we later honed this specifically towards cardiac valve procedures.')
+st.markdown('Initial scoping of our project focused on all cardiac activity, but we later honed this specifically towards cardiac valve procedures and the Kent and Medway region.')
