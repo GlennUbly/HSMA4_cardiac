@@ -117,33 +117,51 @@ def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
 
 gdf = read_ccg_geo_pop_data(ccg_gdf_travel)
 
+###########################################################################
+#
+#                            Streamlit content
+#
+###########################################################################
+
 st.title('Kent and Medway travel times')
 
-st.write("We assess the likely impact of new site(s) on travel "+
-         "times for Kent and Medway patients. The sites considered "+
-         "are the seven in the area with an existing adult critical "+
-         "care unit.")
+show = st.radio('We assess the likely impact of new site(s) on travel'+
+                ' times for Kent and Medway patients.',
+                ('Map of potential sites',
+                 'Distribution of travel times',
+                 'Travel times by LSOA',
+                 'Travel times compared to national median'
+                 ),
+                index=0,
+                horizontal=True
+                )
+if show == 'Map of potential sites' :
+    
+    st.write("The sites considered "+
+             "are the seven in the area with an existing adult critical "+
+             "care unit.")
+    kent_prov = Image.open(os.getcwd()+'/kent_prov.png')
+    st.image(kent_prov)
+    
+if show == 'Distribution of travel times' :
+    kent_kde = Image.open(os.getcwd()+'/km_current_kde.png')
+    st.write('The current travel times for Kent and Medway patients are as '+
+             'follows, with 98.7% of patients with travel times greater than the '+
+             ' national median time of 27 minutes')
+    st.image(kent_kde)
 
+if show == 'Travel times by LSOA' :
+    kent_map = Image.open(os.getcwd()+'/km_current_map.png')
+    st.write('The current travel times are distributed geographically as '+
+              'follows, with almost all patients travelling to the 2 London '+
+              'sites shown')
+    st.image(kent_map)
 
-kent_prov = Image.open(os.getcwd()+'/kent_prov.png')
-st.image(kent_prov)
-
-kent_kde = Image.open(os.getcwd()+'/km_current_kde.png')
-st.write('The current travel times for Kent and Medway patients are as '+
-         'follows, with 98.7% of patients with travel times greater than the '+
-         ' national median time of 27 minutes')
-st.image(kent_kde)
-
-kent_map = Image.open(os.getcwd()+'/km_current_map.png')
-st.write('The current travel times are distributed geographically as '+
-          'follows, with almost all patients travelling to the 2 London '+
-          'sites shown')
-st.image(kent_map)
-
-kent_threshold_map = Image.open(os.getcwd()+'/km_current_threshold_map.png')
-st.write('We see only small area close to London currently sees travel times '+
-         'less than the national median')
-st.image(kent_threshold_map)
+if show == 'Travel times compared to national median' :
+    kent_threshold_map = Image.open(os.getcwd()+'/km_current_threshold_map.png')
+    st.write('We see only small area close to London currently sees travel times '+
+             'less than the national median')
+    st.image(kent_threshold_map)
 
 
 
