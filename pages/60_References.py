@@ -4,9 +4,6 @@ st.title('References')
 
 st.markdown('Full Python code availble on [GitHub]()')
 
-st.write('Data sources, SQL, software used, relevant NHS policies on this '+
-         'service and reducing travel times justification')
-
 #st.markdown('#### Sites with > 10 procedures nationally:')
 national_provider_filename = 'valve_providers.csv'
 #activity_data_filename = "Cardiac valves_national v0.2.csv"
