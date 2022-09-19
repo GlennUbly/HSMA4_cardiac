@@ -854,3 +854,38 @@ else :
 end_full = time.time()
 st.write('Total time to run '+str(end_full - start_full))
 
+# temp to add for conclusions
+# 1 and 2 site configs
+# kde, times, impact, threshold
+#kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
+#plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_list, save_file)
+#plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output)
+#plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output) 
+
+
+# current_list = ['time_'+a for a in current_sites]
+# test_prov_list = ['time_'+prov for prov in new_provider_list]
+# sites = [site_dict2[code] for code in new_provider_list]
+# gdf = lsoa_to_all_gdf.copy()
+# gdf['new_min_time'] = gdf[current_list+test_prov_list].min(axis=1)
+# gdf['current_min_time'] = gdf[current_list].min(axis=1)
+# gdf['Orig_<_nat'] = np.where(gdf[current_list].min(axis=1) <= threshold , True , False)
+# gdf['New_<_nat'] = np.where(gdf[test_prov_list].min(axis=1) <= threshold , True , False)
+# gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'],
+#                                         'Travel time <= national median',
+#                                         np.where(gdf['New_<_nat'],
+#                                                       'Change to <= national median', 
+#                                                       'Travel time > national median')
+#                                               )
+# fig, ax = plt.subplots(figsize=(10, 6))
+# gdf.plot(ax=ax,
+#          column='Compare_with_national',
+#          legend=True)
+# ax.set_axis_off()
+# test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_sites+new_provider_list)]
+# test_prov_gdf.plot(ax=ax, 
+#                         edgecolor='r', 
+#                         facecolor='silver', 
+#                         markersize=200,
+#                         marker='*')
+# fig.savefig(os.getcwd()+'/output/km_current_threshold_map.png')
