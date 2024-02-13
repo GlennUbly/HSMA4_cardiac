@@ -4,7 +4,7 @@
 #
 #                  Package imports and initial data sources
 #
-############################################################################## 
+##############################################################################
 
 import streamlit as st
 import pandas as pd
@@ -55,10 +55,10 @@ ccg_mapping_filename = 'CCG_mapping.csv'
 ##############################################################################
 #
 #               Functions showing lines 54 to 509
-# 
+#
 ##############################################################################
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def read_site_geographic_data(sites_filename):
     #st.write("Cache miss: read_site_geographic_data ran")
     df = pd.read_csv(sites_filename)
@@ -68,7 +68,7 @@ def read_site_geographic_data(sites_filename):
     new_prov_gdf = new_prov_gdf.to_crs(epsg=27700)
     return new_prov_gdf
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def filter_lsoa_to_ics(shape_filename,ics_lsoa_filename,left_on,right_on):
     #st.write("Cache miss: filter_lsoa_to_ics ran")
     lsoa_gdf = gpd.read_file(shape_filename)
@@ -77,7 +77,7 @@ def filter_lsoa_to_ics(shape_filename,ics_lsoa_filename,left_on,right_on):
     ics_lsoa_gdf = ics_lsoa_gdf.to_crs(epsg=27700)
     return ics_lsoa_gdf
 
-#@st.cache(suppress_st_warning=True)
+#@st.cache_data()
 # causes problems if cached, OK if not
 def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #st.write("Cache miss: plot_proposed_sites1 ran")
@@ -121,7 +121,7 @@ def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #return plt.show()
     return fig, ax
 
-#@st.cache(suppress_st_warning=True)
+#@st.cache_data()
 def import_minimal_activity_data(activity_data_minimal_filename):
     # import minimal activity data **4 fields**
     df_activity = pd.read_csv(activity_data_minimal_filename)
@@ -129,8 +129,8 @@ def import_minimal_activity_data(activity_data_minimal_filename):
 
 
 # confirmed used, consider caching - minimal time so no need
-#@st.cache()
-def create_ics_df(df_activity, ics_routino_filename, prov_gdf): 
+#@st.cache_data()
+def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
     # filter to ICS data
     df_ics = df_activity[df_activity['Patient_LSOA'].isin(list(ics_lsoa['yr2011_LSOA']))]
     df_ics = df_ics[['Der_Provider_Site_Code',
@@ -146,7 +146,7 @@ def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
                 left_on = 'Der_Provider_Site_Code',
                 right_on = 'Provider_Site_Code'
                 )
-    return df_ics     
+    return df_ics
 
 # function to create DataFrame of measures for times and distances for a configuration of provider sites
 
@@ -174,7 +174,7 @@ def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
 
 # Not to cache as used many times on different arguments
 def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_prov_list):
-    df_test = df_actuals_augmented.copy()    
+    df_test = df_actuals_augmented.copy()
     # create lists of values for the given new_prov_list from which we find the minimum time an distance
     new_sites_only = ['time_'+prov for prov in new_prov_list]
     df_test['Time_new_sites_min'] = df_test[new_sites_only].min(axis=1)
@@ -218,7 +218,7 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
     time_reduction_per_spell = total_time_reduction/df_test['Time_new_sites_min'].count()
     # Total travel distance reduction (over 70 months), value in km travelled
     total_dist_reduction = (df_test['Distance_original'] - df_test['Distance_min'])[df_test['Time_min'] < df_test['Time_original']].sum()
-    
+
     df_to_add = pd.DataFrame({"Added_providers": [','.join(new_prov_list)],
                               "Number_spells_reduced_time": [sum_reduced],
                               "Proportion_spells_reduced_time": [prop_reduced],
@@ -233,13 +233,13 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
                               "New_time_sd": [test_time_std],
                               "Total_time_reduction": [total_time_reduction],
                               "Time_reduction_per_spell": [time_reduction_per_spell],
-                              "Total_distance_reduction": [total_dist_reduction]                              
+                              "Total_distance_reduction": [total_dist_reduction]
                              })
     df_to_add.set_index("Added_providers", inplace=True)
 
     return df_to_add
 
-    
+
 # function to add in Routino data to the LSOA GeoDataFrame for a list of sites
 # Inputs are: LSOA GeoDataFrame, Routino data, provider site gdf, Site list
 # maybe improve speed with filename for lsoa_gdf ?
@@ -247,15 +247,15 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
 # confirmed used, but mostly in functions that have been updated
 # Also used in the lsoa_to_all_gdf calculation - maybe update that?
 
-@st.cache(suppress_st_warning=True)
-def gdf_add_site_list(ics_routino_filename, shape_filename, prov_gdf, test_prov_list) :
+@st.cache_data()
+def gdf_add_site_list(ics_routino_filename, shape_filename, _prov_gdf, test_prov_list) :
     #st.write("Cache miss: gdf_add_site_list ran")
     lsoa_gdf = gpd.read_file(shape_filename)
     lsoa_gdf = lsoa_gdf.to_crs(epsg=27700)
     df_ics_routino = pd.read_csv(ics_routino_filename)
     prov_dict = dict(zip(prov_gdf.Provider_Site_Code, prov_gdf.Postcode_Trim))
     gdf_test = lsoa_gdf.copy()
-    
+
     for test_prov in test_prov_list :
         right = df_ics_routino[df_ics_routino['to_postcode']==prov_dict[test_prov]][['from_postcode','to_postcode','time_min','distance_km']]
         gdf_test = pd.merge(left=gdf_test,
@@ -290,9 +290,9 @@ def plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_lis
              cax=cax
              )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                       edgecolor='r', 
-                       facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                       edgecolor='r',
+                       facecolor='silver',
                        markersize=200,
                        marker='*')
     if save_output :
@@ -301,7 +301,7 @@ def plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_lis
         plt.savefig(os.getcwd()+'/output/time_impact_maps/'+'-'.join(new_provider_list)+'.png')
     else :
         pass
-    return fig, ax    
+    return fig, ax
 
 def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output) :
     current_list = ['time_'+a for a in current_sites]
@@ -312,10 +312,10 @@ def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_pro
     gdf['current_min_time'] = gdf[current_list].min(axis=1)
     gdf['Orig_<_nat'] = np.where(gdf[current_list].min(axis=1) <= threshold , True , False)
     gdf['New_<_nat'] = np.where(gdf[test_prov_list].min(axis=1) <= threshold , True , False)
-    gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'], 
+    gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'],
                                               'Remains <= national median',
                                               np.where(gdf['New_<_nat'],
-                                                      'Change to <= national median', 
+                                                      'Change to <= national median',
                                                       'Remains > national median')
                                               )
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -327,9 +327,9 @@ def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_pro
                   '\n'.join(sites),
                   fontsize=16)
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_sites+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                        edgecolor='r', 
-                        facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                        edgecolor='r',
+                        facecolor='silver',
                         markersize=200,
                         marker='*')
     if save_output :
@@ -363,9 +363,9 @@ def get_site_pairs(proposed_sites) :
 
 # maybe revise to use only quick functions?
 #test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_prov_list)
-@st.cache(suppress_st_warning=True)
-def get_summary_table(prov_gdf, 
-                      current_sites, 
+@st.cache_data()
+def get_summary_table(_prov_gdf,
+                      current_sites,
                       df_activity,
                       d_prov,
                       site_pairs,
@@ -387,22 +387,22 @@ def get_summary_table(prov_gdf,
     df_results["Time_reduction_per_spell"] = []
     df_results["Total_distance_reduction"] = []
     df_results.set_index("Added_providers", inplace=True)
-    
+
     new_provider_list = prov_gdf['Provider_Site_Code'].to_list()
     for site in current_sites :
         new_provider_list.remove(site)
     for pair in site_pairs :
-        df_to_add = test_sites_quick(df_actuals_augmented, 
-                                     df_activity, 
-                                     d_prov, 
-                                     prov_gdf, 
+        df_to_add = test_sites_quick(df_actuals_augmented,
+                                     df_activity,
+                                     d_prov,
+                                     prov_gdf,
                                      pair)
         df_results = df_results.append(df_to_add)
     for site in new_provider_list :
-        df_to_add = test_sites_quick(df_actuals_augmented, 
-                                     df_activity, 
-                                     d_prov, 
-                                     prov_gdf, 
+        df_to_add = test_sites_quick(df_actuals_augmented,
+                                     df_activity,
+                                     d_prov,
+                                     prov_gdf,
                                      [site])
         df_results = df_results.append(df_to_add)
     if save_output :
@@ -425,7 +425,7 @@ def get_actuals_augmented(df_ics,
                           test_prov_list) :
     df_test = df_ics.copy()
     df_ics_routino = pd.read_csv(ics_routino_filename )
-    for test_prov in test_prov_list :    
+    for test_prov in test_prov_list :
         right = df_ics_routino[df_ics_routino['to_postcode']==d_prov[test_prov]][['from_postcode','to_postcode','time_min','distance_km']]
         df_test = pd.merge(left=df_test,
                            right=right,
@@ -452,15 +452,15 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
     new_sites_only_dist = ['distance_'+prov for prov in test_prov_list]
     df_test['Time_new_sites_min'] = df_test[new_sites_only].min(axis=1)
     df_test['Distance_new_sites_min'] = df_test[new_sites_only_dist].min(axis=1)
-    
+
     new_prov_time_list = ['time_'+a for a in test_prov_list]
     new_prov_time_list.append('Time_original')
     df_test['Time_new_config_min'] = df_test[new_prov_time_list].min(axis=1)
     df_test['Distance_new_config_min'] = df_test[new_prov_time_list].min(axis=1)
-    
+
     filename_site = ','.join(test_prov_list)+'.csv'
     sites = [site_dict2[code] for code in test_prov_list]
-    
+
     fig, ax = plt.subplots(figsize=(10,6))
     sbn.kdeplot(ax=ax,
             data=df_test['Time_original'],
@@ -470,7 +470,7 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
     plt.axvline(x=df_test['Time_original'].median(),
                 linewidth=2,
                 color='cornflowerblue')
-    
+
     sbn.kdeplot(ax=ax,
             data=df_test['Time_new_config_min'],
             clip = (0,125),
@@ -479,12 +479,12 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
             legend=True).set(title='Travel times with additional site at:\n '+
                              '\n'.join(sites))
     plt.axvline(x=df_test['Time_new_config_min'].median(),
-                linewidth=2, 
+                linewidth=2,
                 color='orange')
     plt.axvline(x=threshold,
-                linewidth=2, 
+                linewidth=2,
                 color='g')
-    
+
     ax.set_xlabel('Travel time (mins)')
     plt.legend(('Current travel times',
                 'Median current travel time',
@@ -535,9 +535,9 @@ def plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_l
              cax=cax
             )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                       edgecolor='r', 
-                       facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                       edgecolor='r',
+                       facecolor='silver',
                        markersize=200,
                        marker='*')
     if save_file :
@@ -555,7 +555,7 @@ def plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_l
 #
 #############################################################################
 
-@st.cache(suppress_st_warning=True, allow_output_mutation=True)
+@st.cache_data()
 def get_national_time_map(ccg_mapping_filename, activity_data_minimal_filename) :
     #st.write("Cache miss: get_national_time_map ran")
     df_ccg = pd.read_csv(ccg_mapping_filename, encoding = 'unicode_escape')
@@ -565,9 +565,9 @@ def get_national_time_map(ccg_mapping_filename, activity_data_minimal_filename) 
     # df_activity['Der_Activity_Month'] = df_activity['Der_Activity_Month'].astype(str)
     # df_activity['Admission_Method'] = df_activity['Admission_Method'].astype(str)
     # df_activity['Activity_count'] = 1
-    df_activity = pd.merge(df_activity, 
-                            df_ccg, 
-                            on = 'Pt_CCG_Code', 
+    df_activity = pd.merge(df_activity,
+                            df_ccg,
+                            on = 'Pt_CCG_Code',
                             how = 'left'
                             ).set_index(df_activity.index)
     df_activity['CCG_Code_2122'] = df_activity['CCG_Code_2122'].combine_first(df_activity['Pt_CCG_Code'])
@@ -594,7 +594,7 @@ def get_national_time_map(ccg_mapping_filename, activity_data_minimal_filename) 
                      ].groupby('CCG_2122').agg({'Travel_distance_km':'mean',
                                                 'Travel_time':'mean'}
                                                 ).reset_index()
-                                                
+
     df['CCG_2122_lower'] = df['CCG_2122'].str.lower()
     df = pd.merge(df,
                   ccg_gdf[['Pt_CCG',
@@ -603,16 +603,16 @@ def get_national_time_map(ccg_mapping_filename, activity_data_minimal_filename) 
                            'Population',
                            'Population_density',
                            'geometry']],
-                  on = 'CCG_2122', 
+                  on = 'CCG_2122',
                   how = 'left'
                   )
     df = df.drop(['CCG_2122_lower'], axis=1)
     nat_act_gdf = gpd.GeoDataFrame(df, geometry='geometry')
     return nat_act_gdf
-   
+
 # Exclude providers with < 10 procedures over this time
 # And create national point gdf of these sites
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def get_national_providers(national_provider_filename, activity_data_minimal_filename) :
     #st.write("Cache miss: get_national_providers ran")
     nat_prov_df = pd.read_csv(national_provider_filename)
@@ -622,13 +622,13 @@ def get_national_providers(national_provider_filename, activity_data_minimal_fil
     nat_prov_gdf = nat_prov_gdf.set_crs(epsg=4326)
     nat_prov_gdf = nat_prov_gdf.to_crs(epsg=27700)
     df_activity = import_minimal_activity_data(activity_data_minimal_filename)
-    
+
     df_act_by_prov = df_activity[['Der_Provider_Site_Code']].groupby('Der_Provider_Site_Code').agg({'Der_Provider_Site_Code':'count', })
     df_act_by_prov = df_act_by_prov.rename(columns={"Der_Provider_Site_Code": "count_site"})
     df_act_by_prov = df_act_by_prov[df_act_by_prov['count_site']>10]
     nat_prov10_gdf = pd.merge(nat_prov_gdf,
-                              df_act_by_prov, 
-                              left_on='Provider_Site_Code', 
+                              df_act_by_prov,
+                              left_on='Provider_Site_Code',
                               right_on='Der_Provider_Site_Code'
                               )
     #nat_prov10_gdf = nat_prov10_gdf[nat_prov10_gdf['Activity_count']>10].sort_values('Activity_count', ascending=False)
@@ -728,23 +728,23 @@ st.markdown("We map the travel times based on Routino data for the patient "+
 if not os.path.exists('output') :
     os.mkdir('output')
 if not os.path.exists(os.getcwd()+'/output/nat_map_ccg.png') :
-    fig, ax = plt.subplots(figsize=(8, 8)) 
+    fig, ax = plt.subplots(figsize=(8, 8))
     # Plot CCG by mean travel time
-    nat_act_gdf.plot(ax=ax, 
-                      column='Travel_time', 
-                      edgecolor='face', 
+    nat_act_gdf.plot(ax=ax,
+                      column='Travel_time',
+                      edgecolor='face',
                       linewidth=0.0,
                       vmin=0,
-                      vmax=110, 
-                      cmap='inferno_r', 
+                      vmax=110,
+                      cmap='inferno_r',
                       legend_kwds={'shrink':0.8, 'label':'Travel time (mins)'},
                       legend=True,
                       alpha = 0.70)
     # Plot location of hospitals
-    nat_prov10_gdf.plot(ax=ax, 
+    nat_prov10_gdf.plot(ax=ax,
                     edgecolor='k',
                     facecolor='w',
-                    markersize=200, 
+                    markersize=200,
                     marker='*')
     ax.set_axis_off() # Turn of axis line numbers
     ax.set_title('Cardiac Valve Surgery\nMean Travel Time by CCG')
@@ -761,7 +761,7 @@ st.write("Looking at travel times by CCG, we note a negative "+
          "correlation between population density and mean travel time. "+
          "")
 
-with st.expander("Ranked travel time and population density by CCG", 
+with st.expander("Ranked travel time and population density by CCG",
                  expanded=False) :
     st.dataframe(nat_act_gdf[['CCG_2122',
                               'Travel_time',
@@ -799,14 +799,14 @@ TOOLTIPS = [
     ("Population", "@desc2")
     ]
 
-fig = figure(width=600, 
+fig = figure(width=600,
              height=600,
              tooltips=TOOLTIPS,
              title="Population density against travel time by CCG")
 
 fig.circle('x',
-           'y', 
-           size={'field':'desc2','transform': size_mapper}, 
+           'y',
+           size={'field':'desc2','transform': size_mapper},
            source=source)
 fig.xaxis.axis_label = 'Population density (per sq km)'
 fig.yaxis.axis_label = 'Mean travel time (mins)'
@@ -819,12 +819,12 @@ st.write("We calculate Spearman's rank correlation coefficient to show "+
          "the negative correaltion between CCG mean travel time and "+
          "population density as:")
 st.latex(r'''
-         \rho = 
+         \rho =
          ''' +
          rf''' {a[0]:.2f} '''
          )
 st.latex(r'''
-         p = 
+         p =
          ''' +
          rf''' {a[1]:.19f} '''
          )
@@ -860,7 +860,7 @@ st.write('Total time to run '+str(end_full - start_full))
 #kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
 #plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_list, save_file)
 #plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output)
-#plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output) 
+#plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output)
 
 
 # current_list = ['time_'+a for a in current_sites]
@@ -874,7 +874,7 @@ st.write('Total time to run '+str(end_full - start_full))
 # gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'],
 #                                         'Travel time <= national median',
 #                                         np.where(gdf['New_<_nat'],
-#                                                       'Change to <= national median', 
+#                                                       'Change to <= national median',
 #                                                       'Travel time > national median')
 #                                               )
 # fig, ax = plt.subplots(figsize=(10, 6))
@@ -883,9 +883,9 @@ st.write('Total time to run '+str(end_full - start_full))
 #          legend=True)
 # ax.set_axis_off()
 # test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_sites+new_provider_list)]
-# test_prov_gdf.plot(ax=ax, 
-#                         edgecolor='r', 
-#                         facecolor='silver', 
+# test_prov_gdf.plot(ax=ax,
+#                         edgecolor='r',
+#                         facecolor='silver',
 #                         markersize=200,
 #                         marker='*')
 # fig.savefig(os.getcwd()+'/output/km_current_threshold_map.png')

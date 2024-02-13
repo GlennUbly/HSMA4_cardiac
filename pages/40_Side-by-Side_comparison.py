@@ -54,10 +54,10 @@ ccg_mapping_filename = 'CCG_mapping.csv'
 ##############################################################################
 #
 #               Functions showing lines 54 to 509
-# 
+#
 ##############################################################################
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def read_site_geographic_data(sites_filename):
     #st.write("Cache miss: read_site_geographic_data ran")
     df = pd.read_csv(sites_filename)
@@ -67,7 +67,7 @@ def read_site_geographic_data(sites_filename):
     new_prov_gdf = new_prov_gdf.to_crs(epsg=27700)
     return new_prov_gdf
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def filter_lsoa_to_ics(shape_filename,ics_lsoa_filename,left_on,right_on):
     #st.write("Cache miss: filter_lsoa_to_ics ran")
     lsoa_gdf = gpd.read_file(shape_filename)
@@ -76,7 +76,7 @@ def filter_lsoa_to_ics(shape_filename,ics_lsoa_filename,left_on,right_on):
     ics_lsoa_gdf = ics_lsoa_gdf.to_crs(epsg=27700)
     return ics_lsoa_gdf
 
-#@st.cache(suppress_st_warning=True)
+#@st.cache_data()
 # causes problems if cached, OK if not
 def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #st.write("Cache miss: plot_proposed_sites1 ran")
@@ -120,7 +120,7 @@ def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #return plt.show()
     return fig, ax
 
-# @st.cache(suppress_st_warning=True)
+# @st.cache_data()
 # def import_activity_data(activity_data_filename):
 #     #st.write("Cache miss: import_activity_data ran")
 #     # import activity data **Function will not work unless data is in correct format**
@@ -131,7 +131,7 @@ def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
 #     df_activity['Activity_count'] = 1
 #     return df_activity
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def import_minimal_activity_data(activity_data_minimal_filename):
     # import minimal activity data **4 fields**
     df_activity = pd.read_csv(activity_data_minimal_filename)
@@ -139,7 +139,7 @@ def import_minimal_activity_data(activity_data_minimal_filename):
 
 # confirmed used, consider caching - minimal time so no need
 #@st.cache()
-def create_ics_df(df_activity, ics_routino_filename, prov_gdf): 
+def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
     # filter to ICS data
     df_ics = df_activity[df_activity['Patient_LSOA'].isin(list(ics_lsoa['yr2011_LSOA']))]
     df_ics = df_ics[['Der_Provider_Site_Code',
@@ -155,7 +155,7 @@ def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
                 left_on = 'Der_Provider_Site_Code',
                 right_on = 'Provider_Site_Code'
                 )
-    return df_ics     
+    return df_ics
 
 # function to create DataFrame of measures for times and distances for a configuration of provider sites
 
@@ -183,7 +183,7 @@ def create_ics_df(df_activity, ics_routino_filename, prov_gdf):
 
 # Not to cache as used many times on different arguments
 def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_prov_list):
-    df_test = df_actuals_augmented.copy()    
+    df_test = df_actuals_augmented.copy()
     # create lists of values for the given new_prov_list from which we find the minimum time an distance
     new_sites_only = ['time_'+prov for prov in new_prov_list]
     df_test['Time_new_sites_min'] = df_test[new_sites_only].min(axis=1)
@@ -227,7 +227,7 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
     time_reduction_per_spell = total_time_reduction/df_test['Time_new_sites_min'].count()
     # Total travel distance reduction (over 70 months), value in km travelled
     total_dist_reduction = (df_test['Distance_original'] - df_test['Distance_min'])[df_test['Time_min'] < df_test['Time_original']].sum()
-    
+
     df_to_add = pd.DataFrame({"Added_providers": [','.join(new_prov_list)],
                               "Number_spells_reduced_time": [sum_reduced],
                               "Proportion_spells_reduced_time": [prop_reduced],
@@ -242,13 +242,13 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
                               "New_time_sd": [test_time_std],
                               "Total_time_reduction": [total_time_reduction],
                               "Time_reduction_per_spell": [time_reduction_per_spell],
-                              "Total_distance_reduction": [total_dist_reduction]                              
+                              "Total_distance_reduction": [total_dist_reduction]
                              })
     df_to_add.set_index("Added_providers", inplace=True)
 
     return df_to_add
 
-    
+
 # function to add in Routino data to the LSOA GeoDataFrame for a list of sites
 # Inputs are: LSOA GeoDataFrame, Routino data, provider site gdf, Site list
 # maybe improve speed with filename for lsoa_gdf ?
@@ -256,15 +256,15 @@ def test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_pr
 # confirmed used, but mostly in functions that have been updated
 # Also used in the lsoa_to_all_gdf calculation - maybe update that?
 
-@st.cache(suppress_st_warning=True)
-def gdf_add_site_list(ics_routino_filename, shape_filename, prov_gdf, test_prov_list) :
+@st.cache_data()
+def gdf_add_site_list(ics_routino_filename, shape_filename, _prov_gdf, test_prov_list) :
     #st.write("Cache miss: gdf_add_site_list ran")
     lsoa_gdf = gpd.read_file(shape_filename)
     lsoa_gdf = lsoa_gdf.to_crs(epsg=27700)
     df_ics_routino = pd.read_csv(ics_routino_filename)
     prov_dict = dict(zip(prov_gdf.Provider_Site_Code, prov_gdf.Postcode_Trim))
     gdf_test = lsoa_gdf.copy()
-    
+
     for test_prov in test_prov_list :
         right = df_ics_routino[df_ics_routino['to_postcode']==prov_dict[test_prov]][['from_postcode','to_postcode','time_min','distance_km']]
         gdf_test = pd.merge(left=gdf_test,
@@ -300,9 +300,9 @@ def plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_lis
              cax=cax
              )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                       edgecolor='r', 
-                       facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                       edgecolor='r',
+                       facecolor='silver',
                        markersize=200,
                        marker='*')
     if save_output :
@@ -311,7 +311,7 @@ def plot_times_impact_quick(lsoa_to_all_gdf, current_providers, new_provider_lis
         plt.savefig(os.getcwd()+'/output/time_impact_maps/'+'-'.join(new_provider_list)+'.png')
     else :
         pass
-    return fig, ax    
+    return fig, ax
 
 def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_provider_list, prov_gdf, threshold, save_output) :
     current_list = ['time_'+a for a in current_sites]
@@ -322,10 +322,10 @@ def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_pro
     gdf['current_min_time'] = gdf[current_list].min(axis=1)
     gdf['Orig_<_nat'] = np.where(gdf[current_list].min(axis=1) <= threshold , True , False)
     gdf['New_<_nat'] = np.where(gdf[test_prov_list].min(axis=1) <= threshold , True , False)
-    gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'], 
+    gdf['Compare_with_national'] = np.where(gdf['Orig_<_nat'],
                                               'Remains <= national median',
                                               np.where(gdf['New_<_nat'],
-                                                      'Change to <= national median', 
+                                                      'Change to <= national median',
                                                       'Remains > national median')
                                               )
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -337,9 +337,9 @@ def plot_time_impact_threshold_quick(lsoa_to_all_gdf, current_providers, new_pro
                   '\n'.join(sites),
                   fontsize=16)
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_sites+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                        edgecolor='r', 
-                        facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                        edgecolor='r',
+                        facecolor='silver',
                         markersize=200,
                         marker='*')
     if save_output :
@@ -373,9 +373,9 @@ def get_site_pairs(proposed_sites) :
 
 # maybe revise to use only quick functions?
 #test_sites_quick(df_actuals_augmented, df_activity, d_prov, prov_gdf, new_prov_list)
-@st.cache(suppress_st_warning=True)
-def get_summary_table(prov_gdf, 
-                      current_sites, 
+@st.cache_data()
+def get_summary_table(_prov_gdf,
+                      current_sites,
                       df_activity,
                       d_prov,
                       site_pairs,
@@ -397,22 +397,22 @@ def get_summary_table(prov_gdf,
     df_results["Time_reduction_per_spell"] = []
     df_results["Total_distance_reduction"] = []
     df_results.set_index("Added_providers", inplace=True)
-    
+
     new_provider_list = prov_gdf['Provider_Site_Code'].to_list()
     for site in current_sites :
         new_provider_list.remove(site)
     for pair in site_pairs :
-        df_to_add = test_sites_quick(df_actuals_augmented, 
-                                     df_activity, 
-                                     d_prov, 
-                                     prov_gdf, 
+        df_to_add = test_sites_quick(df_actuals_augmented,
+                                     df_activity,
+                                     d_prov,
+                                     prov_gdf,
                                      pair)
         df_results = df_results.append(df_to_add)
     for site in new_provider_list :
-        df_to_add = test_sites_quick(df_actuals_augmented, 
-                                     df_activity, 
-                                     d_prov, 
-                                     prov_gdf, 
+        df_to_add = test_sites_quick(df_actuals_augmented,
+                                     df_activity,
+                                     d_prov,
+                                     prov_gdf,
                                      [site])
         df_results = df_results.append(df_to_add)
     if save_output :
@@ -435,7 +435,7 @@ def get_actuals_augmented(df_ics,
                           test_prov_list) :
     df_test = df_ics.copy()
     df_ics_routino = pd.read_csv(ics_routino_filename )
-    for test_prov in test_prov_list :    
+    for test_prov in test_prov_list :
         right = df_ics_routino[df_ics_routino['to_postcode']==d_prov[test_prov]][['from_postcode','to_postcode','time_min','distance_km']]
         df_test = pd.merge(left=df_test,
                            right=right,
@@ -462,15 +462,15 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
     new_sites_only_dist = ['distance_'+prov for prov in test_prov_list]
     df_test['Time_new_sites_min'] = df_test[new_sites_only].min(axis=1)
     df_test['Distance_new_sites_min'] = df_test[new_sites_only_dist].min(axis=1)
-    
+
     new_prov_time_list = ['time_'+a for a in test_prov_list]
     new_prov_time_list.append('Time_original')
     df_test['Time_new_config_min'] = df_test[new_prov_time_list].min(axis=1)
     df_test['Distance_new_config_min'] = df_test[new_prov_time_list].min(axis=1)
-    
+
     filename_site = ','.join(test_prov_list)+'.csv'
     sites = [site_dict2[code] for code in test_prov_list]
-    
+
     fig, ax = plt.subplots(figsize=(10,6))
     sbn.kdeplot(ax=ax,
             data=df_test['Time_original'],
@@ -480,7 +480,7 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
     plt.axvline(x=df_test['Time_original'].median(),
                 linewidth=2,
                 color='cornflowerblue')
-    
+
     sbn.kdeplot(ax=ax,
             data=df_test['Time_new_config_min'],
             clip = (0,125),
@@ -489,12 +489,12 @@ def kde_plot_quick(df_actuals_augmented, test_prov_list, threshold, save_output)
             legend=True).set(title='Travel times with additional site at:\n '+
                              '\n'.join(sites))
     plt.axvline(x=df_test['Time_new_config_min'].median(),
-                linewidth=2, 
+                linewidth=2,
                 color='orange')
     plt.axvline(x=threshold,
-                linewidth=2, 
+                linewidth=2,
                 color='g')
-    
+
     ax.set_xlabel('Travel time (mins)')
     plt.legend(('Current travel times',
                 'Median current travel time',
@@ -546,9 +546,9 @@ def plot_new_prov_times_quick(lsoa_to_all_gdf, current_providers, new_provider_l
              cax=cax
             )
     test_prov_gdf = prov_gdf[prov_gdf['Provider_Site_Code'].isin(current_providers+new_provider_list)]
-    test_prov_gdf.plot(ax=ax, 
-                       edgecolor='r', 
-                       facecolor='silver', 
+    test_prov_gdf.plot(ax=ax,
+                       edgecolor='r',
+                       facecolor='silver',
                        markersize=200,
                        marker='*')
     if save_file :
@@ -637,98 +637,98 @@ with col1 :
     fig, ax = f
     st.pyplot(fig)
     # new time map
-    f = plot_new_prov_times_quick(lsoa_to_all_gdf, 
+    f = plot_new_prov_times_quick(lsoa_to_all_gdf,
                               current_sites,
                               sites,
                               False)
     fig, ax = f
     st.pyplot(fig)
     # time impact map
-    f = plot_times_impact_quick(lsoa_to_all_gdf, 
-                            current_sites, 
-                            sites, 
-                            prov_gdf, 
+    f = plot_times_impact_quick(lsoa_to_all_gdf,
+                            current_sites,
+                            sites,
+                            prov_gdf,
                             threshold,
                             save_output)
     fig, ax = f
     st.pyplot(fig)
     # impact relative to threshold map
-    f = plot_time_impact_threshold_quick(lsoa_to_all_gdf, 
-                                     current_sites, 
+    f = plot_time_impact_threshold_quick(lsoa_to_all_gdf,
+                                     current_sites,
                                      sites,
-                                     prov_gdf, 
+                                     prov_gdf,
                                      threshold,
                                      save_output)
     fig, ax = f
     st.pyplot(fig)
-    
+
     # comparison sentences
-    
+
     if len(sites) == 1 :
         site = ','.join(sites)
         #st.subheader('Comparison with the other configurations with 1 additional site')
-        
+
         df_results_one = df_results.copy().reset_index(drop=False)
         df_results_one = df_results_one[df_results_one['Added_providers'].str.len()==5]
         count_options = len(df_results_one)
-        
+
         med_orig = df_results.loc[site]['Original_median_time']
         med_new = df_results.loc[site]['New_median_time']
         df_results_one['New_median_time_rank'] = df_results_one['New_median_time'].rank(method='min', ascending=True)
         new_med_time_dict = dict(zip(df_results_one['Added_providers'], df_results_one['New_median_time_rank']))
         new_med_time_rank = new_med_time_dict[site]
-        
+
         proportion_reduced = df_results.loc[site]['Proportion_spells_reduced_time']
         df_results_one['Prop_reduced_rank'] = df_results_one['Proportion_spells_reduced_time'].rank(method='min', ascending=False)
         prop_reduced_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Prop_reduced_rank']))
         prop_reduced_rank = prop_reduced_dict[site]
-        
+
         proportion_spells_under_natl_median = df_results.loc[site]['Proportion_spells_under_natl_median']
         df_results_one['Prop_under_nat_median_rank'] = df_results_one['Proportion_spells_under_natl_median'].rank(method='min', ascending=False)
         prop_under_nat_median_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Prop_under_nat_median_rank']))
         prop_under_nat_median_rank = prop_under_nat_median_dict[site]
-        
+
         mean_time_reduction = df_results.loc[site]['Time_reduction_per_spell']
         df_results_one['Time_reduction_rank'] = df_results_one['Time_reduction_per_spell'].rank(method='min', ascending=False)
         time_reduction_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Time_reduction_rank']))
         time_reduction_rank = time_reduction_dict[site]
-        
+
         total_distance_reduction = df_results.loc[site]['Total_distance_reduction']
         df_results_one['Dist_reduction_rank'] = df_results_one['Total_distance_reduction'].rank(method='min', ascending=False)
         dist_reduction_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Dist_reduction_rank']))
         dist_reduction_rank = dist_reduction_dict[site]
-        
+
         new_max_time = df_results.loc[site]['New_maximum_time']
         df_results_one['Max_time_rank'] = df_results_one['New_maximum_time'].rank(method='min', ascending=True)
         max_time_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Max_time_rank']))
         max_time_rank = max_time_dict[site]
-        
+
         st.markdown('#### Impact of additional site at {} on key travel time metrics'.format(selected_site_pair1[0]))
-        
+
         st.markdown(f'* Median travel time for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown('* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')
@@ -738,190 +738,190 @@ with col1 :
                       time_reduction_rank,
                       dist_reduction_rank,
                       max_time_rank]
-        
+
     elif len(sites) == 2 :
         sites.sort()
         site = ','.join(sites)
         st.subheader('Comparison with the other configurations with 2 additional sites')
-        
+
         df_results_two = df_results.copy().reset_index(drop=False)
         df_results_two = df_results_two[df_results_two['Added_providers'].str.len()==11]
         count_options = len(df_results_two)
-    
+
         med_orig = df_results.loc[site]['Original_median_time']
         med_new = df_results.loc[site]['New_median_time']
         df_results_two['New_median_time_rank'] = df_results_two['New_median_time'].rank(method='min', ascending=True)
         new_med_time_dict = dict(zip(df_results_two['Added_providers'], df_results_two['New_median_time_rank']))
         new_med_time_rank = new_med_time_dict[site]
-        
+
         proportion_reduced = df_results.loc[site]['Proportion_spells_reduced_time']
         df_results_two['Prop_reduced_rank'] = df_results_two['Proportion_spells_reduced_time'].rank(method='min', ascending=False)
         prop_reduced_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Prop_reduced_rank']))
         prop_reduced_rank = prop_reduced_dict[site]
-        
+
         proportion_spells_under_natl_median = df_results.loc[site]['Proportion_spells_under_natl_median']
         df_results_two['Prop_under_nat_median_rank'] = df_results_two['Proportion_spells_under_natl_median'].rank(method='min', ascending=False)
         prop_under_nat_median_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Prop_under_nat_median_rank']))
         prop_under_nat_median_rank = prop_under_nat_median_dict[site]
-        
+
         mean_time_reduction = df_results.loc[site]['Time_reduction_per_spell']
         df_results_two['Time_reduction_rank'] = df_results_two['Time_reduction_per_spell'].rank(method='min', ascending=False)
         time_reduction_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Time_reduction_rank']))
         time_reduction_rank = time_reduction_dict[site]
-        
+
         total_distance_reduction = df_results.loc[site]['Total_distance_reduction']
         df_results_two['Dist_reduction_rank'] = df_results_two['Total_distance_reduction'].rank(method='min', ascending=False)
         dist_reduction_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Dist_reduction_rank']))
         dist_reduction_rank = dist_reduction_dict[site]
-        
+
         new_max_time = df_results.loc[site]['New_maximum_time']
         df_results_two['Max_time_rank'] = df_results_two['New_maximum_time'].rank(method='min', ascending=True)
         max_time_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Max_time_rank']))
         max_time_rank = max_time_dict[site]
-        
+
         st.markdown('#### Impact of additional sites on key travel time metrics:')
         st.markdown(f'#### {selected_site_pair1[0]}')
         st.markdown(f'#### {selected_site_pair1[1]}')
-        
+
         st.markdown(f'* Median travel time for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
-                 f'out of {count_options} for this metric.')    
-        
+                 f'out of {count_options} for this metric.')
+
         rank_list1 = [new_med_time_rank,
                       prop_reduced_rank,
                       prop_under_nat_median_rank,
                       time_reduction_rank,
                       dist_reduction_rank,
                       max_time_rank]
-    
+
     elif len(sites) == 0 :
         pass
-    
+
     else :
         st.write('Rankings not yet available for multiple sites')
-    
-   
+
+
 with col2 :
     sites = [site_dict[site] for site in selected_site_pair2]
     f = kde_plot_quick(df_actuals_augmented, sites, threshold, save_output)
     fig, ax = f
     st.pyplot(fig)
     # new time map
-    f = plot_new_prov_times_quick(lsoa_to_all_gdf, 
+    f = plot_new_prov_times_quick(lsoa_to_all_gdf,
                               current_sites,
                               sites,
                               False)
     fig, ax = f
     st.pyplot(fig)
     # time impact plot
-    f = plot_times_impact_quick(lsoa_to_all_gdf, 
-                            current_sites, 
-                            sites, 
-                            prov_gdf, 
+    f = plot_times_impact_quick(lsoa_to_all_gdf,
+                            current_sites,
+                            sites,
+                            prov_gdf,
                             threshold,
                             save_output)
     fig, ax = f
     st.pyplot(fig)
     # impact relative to threshold map
-    f = plot_time_impact_threshold_quick(lsoa_to_all_gdf, 
-                                     current_sites, 
+    f = plot_time_impact_threshold_quick(lsoa_to_all_gdf,
+                                     current_sites,
                                      sites,
-                                     prov_gdf, 
+                                     prov_gdf,
                                      threshold,
                                      save_output)
     fig, ax = f
     st.pyplot(fig)
-    
+
     # comparison sentences
     if len(sites) == 1 :
         site = ','.join(sites)
         #st.subheader('Comparison with the other configurations with 1 additional site')
-        
+
         df_results_one = df_results.copy().reset_index(drop=False)
         df_results_one = df_results_one[df_results_one['Added_providers'].str.len()==5]
         count_options = len(df_results_one)
-        
+
         med_orig = df_results.loc[site]['Original_median_time']
         med_new = df_results.loc[site]['New_median_time']
         df_results_one['New_median_time_rank'] = df_results_one['New_median_time'].rank(method='min', ascending=True)
         new_med_time_dict = dict(zip(df_results_one['Added_providers'], df_results_one['New_median_time_rank']))
         new_med_time_rank = new_med_time_dict[site]
-        
+
         proportion_reduced = df_results.loc[site]['Proportion_spells_reduced_time']
         df_results_one['Prop_reduced_rank'] = df_results_one['Proportion_spells_reduced_time'].rank(method='min', ascending=False)
         prop_reduced_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Prop_reduced_rank']))
         prop_reduced_rank = prop_reduced_dict[site]
-        
+
         proportion_spells_under_natl_median = df_results.loc[site]['Proportion_spells_under_natl_median']
         df_results_one['Prop_under_nat_median_rank'] = df_results_one['Proportion_spells_under_natl_median'].rank(method='min', ascending=False)
         prop_under_nat_median_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Prop_under_nat_median_rank']))
         prop_under_nat_median_rank = prop_under_nat_median_dict[site]
-        
+
         mean_time_reduction = df_results.loc[site]['Time_reduction_per_spell']
         df_results_one['Time_reduction_rank'] = df_results_one['Time_reduction_per_spell'].rank(method='min', ascending=False)
         time_reduction_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Time_reduction_rank']))
         time_reduction_rank = time_reduction_dict[site]
-        
+
         total_distance_reduction = df_results.loc[site]['Total_distance_reduction']
         df_results_one['Dist_reduction_rank'] = df_results_one['Total_distance_reduction'].rank(method='min', ascending=False)
         dist_reduction_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Dist_reduction_rank']))
         dist_reduction_rank = dist_reduction_dict[site]
-        
+
         new_max_time = df_results.loc[site]['New_maximum_time']
         df_results_one['Max_time_rank'] = df_results_one['New_maximum_time'].rank(method='min', ascending=True)
         max_time_dict = dict(zip(df_results_one['Added_providers'], df_results_one['Max_time_rank']))
         max_time_rank = max_time_dict[site]
-        
+
         st.markdown('#### Impact of additional site at {} on key travel time metrics'.format(selected_site_pair2[0]))
-        
+
         st.markdown(f'* Median travel for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown('* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
                  f'out of {count_options} for this metric.')
@@ -931,89 +931,89 @@ with col2 :
                       time_reduction_rank,
                       dist_reduction_rank,
                       max_time_rank]
-    
+
     elif len(sites) == 2 :
         sites.sort()
         site = ','.join(sites)
         st.subheader('Comparison with the other configurations with 2 additional sites')
-        
+
         df_results_two = df_results.copy().reset_index(drop=False)
         df_results_two = df_results_two[df_results_two['Added_providers'].str.len()==11]
         count_options = len(df_results_two)
-    
+
         med_orig = df_results.loc[site]['Original_median_time']
         med_new = df_results.loc[site]['New_median_time']
         df_results_two['New_median_time_rank'] = df_results_two['New_median_time'].rank(method='min', ascending=True)
         new_med_time_dict = dict(zip(df_results_two['Added_providers'], df_results_two['New_median_time_rank']))
         new_med_time_rank = new_med_time_dict[site]
-        
+
         proportion_reduced = df_results.loc[site]['Proportion_spells_reduced_time']
         df_results_two['Prop_reduced_rank'] = df_results_two['Proportion_spells_reduced_time'].rank(method='min', ascending=False)
         prop_reduced_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Prop_reduced_rank']))
         prop_reduced_rank = prop_reduced_dict[site]
-        
+
         proportion_spells_under_natl_median = df_results.loc[site]['Proportion_spells_under_natl_median']
         df_results_two['Prop_under_nat_median_rank'] = df_results_two['Proportion_spells_under_natl_median'].rank(method='min', ascending=False)
         prop_under_nat_median_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Prop_under_nat_median_rank']))
         prop_under_nat_median_rank = prop_under_nat_median_dict[site]
-        
+
         mean_time_reduction = df_results.loc[site]['Time_reduction_per_spell']
         df_results_two['Time_reduction_rank'] = df_results_two['Time_reduction_per_spell'].rank(method='min', ascending=False)
         time_reduction_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Time_reduction_rank']))
         time_reduction_rank = time_reduction_dict[site]
-        
+
         total_distance_reduction = df_results.loc[site]['Total_distance_reduction']
         df_results_two['Dist_reduction_rank'] = df_results_two['Total_distance_reduction'].rank(method='min', ascending=False)
         dist_reduction_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Dist_reduction_rank']))
         dist_reduction_rank = dist_reduction_dict[site]
-        
+
         new_max_time = df_results.loc[site]['New_maximum_time']
         df_results_two['Max_time_rank'] = df_results_two['New_maximum_time'].rank(method='min', ascending=True)
         max_time_dict = dict(zip(df_results_two['Added_providers'], df_results_two['Max_time_rank']))
         max_time_rank = max_time_dict[site]
-        
+
         st.markdown('#### Impact of additional sites on key travel time metrics:')
         st.markdown(f'#### {selected_site_pair2[0]}')
         st.markdown(f'#### {selected_site_pair2[1]}')
-        
+
         st.markdown(f'* Median travel for Kent and Medway patients reduced '+
                  f'from {med_orig:.0f} to {med_new:.0f} minutes. '+
                  f'This configuration ranks {new_med_time_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced for {100*proportion_reduced:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_reduced_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Travel times would be reduced to less than the national median '+
                  f'for {100*proportion_spells_under_natl_median:.0f}% '+
                  'of the Kent and Medway patients, based on historic activity. '+
                  f'This configuration ranks {prop_under_nat_median_rank:.0f} out of '+
                  f'{count_options} for this metric.')
-        
+
         st.markdown(f'* Mean travel time reduction would be {mean_time_reduction:.0f} '+
                  f'minutes. This configuration ranks {time_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* Total travel distance (1 way) reduction would be {total_distance_reduction:,.0f} '+
                  f'km for the period of actuals considered. This configuration ranks {dist_reduction_rank:.0f} '+
                  f'out of {count_options} for this metric.')
-        
+
         st.markdown(f'* The new maximum travel time would be {new_max_time:.0f} minutes. '+
                  f'This configuration ranks {max_time_rank:.0f} '+
-                 f'out of {count_options} for this metric.')    
-        
+                 f'out of {count_options} for this metric.')
+
         rank_list2 = [new_med_time_rank,
                       prop_reduced_rank,
                       prop_under_nat_median_rank,
                       time_reduction_rank,
                       dist_reduction_rank,
                       max_time_rank]
-    
+
     elif len(sites) == 0 :
         pass
-    
+
     else :
         st.write('Rankings not yet available for multiple sites')
 
@@ -1032,7 +1032,7 @@ elif len(selected_site_pair1) == 1 and len(selected_site_pair2) == 1 :
         st.markdown(f'### Comparing these 2 configurations we see the option of')
         st.markdown(f'## {selected_site_pair1[0]}')
         st.markdown(f'### is superior in {count_metric1} out of {len(rank_list1)} metrics.')
-   
+
     elif count_metric2 > count_metric1 :
         st.markdown('### Comparing these 2 configurations we see the option of')
         st.markdown(f'## {selected_site_pair2[0]}')
@@ -1046,7 +1046,7 @@ elif len(selected_site_pair1) == 2 and len(selected_site_pair2) == 2 :
         st.markdown(f'## {selected_site_pair1[0]}')
         st.markdown(f'## {selected_site_pair1[1]}')
         st.markdown(f'### is superior in {count_metric1} out of {len(rank_list1)} metrics.')
-   
+
     elif count_metric2 > count_metric1 :
         st.markdown('### Comparing these 2 configurations we see the option of')
         st.markdown(f'## {selected_site_pair2[0]}')
@@ -1056,13 +1056,3 @@ elif len(selected_site_pair1) == 2 and len(selected_site_pair2) == 2 :
 
 else :
     pass
-
-
-
-
-
-
-
-
-
-
