@@ -915,4 +915,4 @@ st.write(df_results)
 #st.write(type(df_results['Number_spells_reduced_time'][0]))
 
 end_full = time.time()
-st.write('Total time to run '+str(end_full - start_full))
+st.write('Total time to run '+str(round(end_full - start_full,1)) + ' seconds')

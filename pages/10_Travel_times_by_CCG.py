@@ -852,7 +852,7 @@ else :
 
 
 end_full = time.time()
-st.write('Total time to run '+str(end_full - start_full))
+st.write('Total time to run '+str(round(end_full - start_full,1)) + ' seconds')
 
 # temp to add for conclusions
 # 1 and 2 site configs
