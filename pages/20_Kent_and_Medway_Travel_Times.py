@@ -42,7 +42,7 @@ ccg_mapping_filename = 'CCG_mapping.csv'
 ccg_gdf_travel = 'ccg_gdf_travel.csv'
 #gdf = gpd.read_file('valve_ccg_gdf.csv', GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO", dtype=np.float64)
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def read_site_geographic_data(sites_filename):
     #st.write("Cache miss: read_site_geographic_data ran")
     df = pd.read_csv(sites_filename)
@@ -57,12 +57,12 @@ def import_minimal_activity_data(activity_data_minimal_filename):
     df_activity = pd.read_csv(activity_data_minimal_filename)
     return df_activity
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def read_ccg_geo_pop_data(ccg_gdf_travel):
     #st.write("Cache miss: read_site_geographic_data ran")
-    gdf = gpd.read_file(ccg_gdf_travel, 
+    gdf = gpd.read_file(ccg_gdf_travel,
                         GEOM_POSSIBLE_NAMES="geometry",
-                        KEEP_GEOM_COLUMNS="NO", 
+                        KEEP_GEOM_COLUMNS="NO",
                         dtype=np.float64)
     gdf['Population'] = gdf['Population'].astype(float)
     gdf['Population_density'] = gdf['Population_density'].astype(float)
@@ -71,7 +71,7 @@ def read_ccg_geo_pop_data(ccg_gdf_travel):
     gdf['Travel_time'] = gdf['Travel_time'].astype(float)
     return gdf
 
-#@st.cache(suppress_st_warning=True)
+#@st.cache_data()
 # causes problems if cached, OK if not
 def plot_proposed_sites1(prov_gdf, ics_gdf,axis_title):
     #st.write("Cache miss: plot_proposed_sites1 ran")
@@ -136,13 +136,13 @@ show = st.radio('We assess the likely impact of new site(s) on travel'+
                 horizontal=True
                 )
 if show == 'Map of potential sites' :
-    
+
     st.write("The sites considered "+
              "are the seven in the area with an existing adult critical "+
              "care unit.")
     kent_prov = Image.open(os.getcwd()+'/kent_prov.png')
     st.image(kent_prov)
-    
+
 if show == 'Distribution of travel times' :
     kent_kde = Image.open(os.getcwd()+'/km_current_kde.png')
     st.write('The current travel times for Kent and Medway patients are as '+
@@ -162,7 +162,3 @@ if show == 'Travel times compared to national median' :
     st.write('We see only small area close to London currently sees travel times '+
              'less than the national median')
     st.image(kent_threshold_map)
-
-
-
-
